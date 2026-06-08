@@ -35,6 +35,7 @@ MANZANA = 3
 # del tablero que se encuentra en función reiniciar().
 FILAS = 15
 COLUMNAS = 15
+MANZANAS_PARA_GANAR = 5
 
 
 def aparecer_aleatorio(tablero, id_elem):
@@ -210,7 +211,7 @@ def cambiar_direccion(keys, direccion_actual):
     return direccion_actual
 
 
-def avanzar(tablero, pos_jugador, direccion):
+def avanzar(tablero, pos_jugador, direccion, manzanas_comidas):
     """
     Avanza el jugador un paso en la dirección dada.
 
@@ -238,24 +239,28 @@ def avanzar(tablero, pos_jugador, direccion):
 
     # Verificamos que no haya choque con el borde del tablero.
     if not (0 <= ind_nueva_col < COLUMNAS and 0 <= ind_nueva_fila < FILAS):
-        return "derrota", pos_jugador
+        return "derrota", pos_jugador, manzanas_comidas 
 
     # Obtenemos el elemento que se encuentre en el tablero en la nueva posición del jugador.
     pos_elem = tablero[ind_nueva_fila][ind_nueva_col]
 
     if pos_elem == OBSTACULO:
-        return "derrota", pos_jugador
+        return "derrota", pos_jugador, manzanas_comidas 
 
-    if pos_elem == MANZANA:
-        return "victoria", (ind_nueva_col, ind_nueva_fila)
+    if pos_elem == MANZANA :
+        manzanas_comidas += 1
+        # Mover al jugador a la nueva casilla
+        tablero [ ind_actual_fila ][ ind_actual_col ] = VACIO
+        tablero [ ind_nueva_fila ] [ ind_nueva_col ] = JUGADOR
+        # Si llegamos al objetivo, victoria
+        if manzanas_comidas >= MANZANAS_PARA_GANAR:
+            return "victoria", (ind_nueva_col, ind_nueva_fila), manzanas_comidas
+        aparecer_aleatorio(tablero, MANZANA)
+        return "ok", (ind_nueva_col, ind_nueva_fila), manzanas_comidas
 
-    # Movimiento normal, si es que no encontramos manzana ni obstáculo.
     tablero[ind_actual_fila][ind_actual_col] = VACIO
     tablero[ind_nueva_fila][ind_nueva_col] = JUGADOR
-
-    return "ok", (ind_nueva_col, ind_nueva_fila)
-
-
+    return "ok", (ind_nueva_col, ind_nueva_fila), manzanas_comidas
 def reiniciar():
     """
     Crea un nuevo tablero y estado para una nueva partida.
@@ -351,7 +356,7 @@ def main():
     pos_jugador = (0, 0)
     direccion = (0, 0)
     tiempo_ultimo_mov = 0
-
+    manzanas_comidas = 0
     mostrar_pantalla(screen, PANTALLA_INICIO)
 
     # Este es el bucle principal del juego, todo lo que sucede en el juego
@@ -368,6 +373,7 @@ def main():
                 if estado == ESTADO_INICIO:
                     if evento.key == pygame.K_SPACE:
                         tablero, pos_jugador = reiniciar()
+                        manzanas_comidas = 0
                         direccion = (0, 0)
                         # Obtiene tiempo en milisegundos
                         tiempo_ultimo_mov = pygame.time.get_ticks()
@@ -384,6 +390,7 @@ def main():
                 elif estado in (ESTADO_DERROTA, ESTADO_VICTORIA):
                     if evento.key == pygame.K_r:
                         tablero, pos_jugador = reiniciar()
+                        manzanas_comidas= 0
                         direccion = (0, 0)
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
@@ -402,7 +409,7 @@ def main():
             # La variable RETRASO hace que si no han pasado esa cantidad de ticks,
             # entonces no se avanzará en el tablero.
             if direccion != (0, 0) and tiempo_actual - tiempo_ultimo_mov >= RETRASO:
-                resultado, pos_jugador = avanzar(tablero, pos_jugador, direccion)
+                resultado, pos_jugador, manzanas_comidas = avanzar (tablero, pos_jugador, direccion, manzanas_comidas)
 
                 if resultado == "derrota":
                     estado = ESTADO_DERROTA
