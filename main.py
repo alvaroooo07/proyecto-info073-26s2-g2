@@ -38,7 +38,7 @@ COLUMNAS = 15
 MANZANAS_PARA_GANAR = 5
 
 
-def aparecer_aleatorio(tablero, id_elem):
+def aparecer_aleatorio(tablero, id_elem, incluir_borde = True):
     """
     Coloca un elemento en una casilla vacía aleatoria del tablero.
 
@@ -78,6 +78,12 @@ def aparecer_aleatorio(tablero, id_elem):
     # ]
 
     # Si no hay casillas vacías, retornamos un valor especial.
+    if not incluir_borde :
+        BORDE = ([( c , 0) for c in range ( COLUMNAS ) ]
+        + [( c , FILAS - 1) for c in range ( COLUMNAS ) ]
+        + [(0 , f ) for f in range (1 , FILAS - 1) ]
+        + [( COLUMNAS - 1 , f ) for f in range (1 , FILAS - 1) ])
+        vacios = [ pos for pos in vacios if pos not in BORDE ]    
     if len(vacios) == 0:
         return -1, -1
 
@@ -99,7 +105,9 @@ def poblar_tablero(tablero):
     Parámetros:
         - tablero: El tablero con sus posiciones actuales.
     """
-    aparecer_aleatorio(tablero, OBSTACULO)
+    CANT_OBSTACULOS = 10
+    for i in range ( CANT_OBSTACULOS ) :
+        aparecer_aleatorio(tablero, OBSTACULO,incluir_borde = False)
     aparecer_aleatorio(tablero, MANZANA)
 
 
