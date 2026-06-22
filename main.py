@@ -1,7 +1,7 @@
 # Importamos módulos requeridos
 import os
 import random
-
+import pygame.image
 import pygame
 
 # Estados del juego
@@ -16,10 +16,15 @@ DIR_PANTALLAS = os.path.join(os.path.dirname(__file__), "data", "pantallas")
 
 # Se específica el nombre del archivo para cada imagen de pantalla.
 # El formato de imagen utilizado puede ser PNG, JPG/JPEG, BMP, o GIF.
-PANTALLA_INICIO = "pantalla_inicio.bmp"
-PANTALLA_INSTRUCCIONES = "pantalla_instrucciones.bmp"
-PANTALLA_VICTORIA = "pantalla_victoria.bmp"
-PANTALLA_DERROTA = "pantalla_derrota.bmp"
+PANTALLA_INICIO = r"D:\\TomasorXD\\PYTHON\Juego\\Textures\\inicioTEST.jpg"
+PANTALLA_INSTRUCCIONES = r"D:\\TomasorXD\\PYTHON\Juego\\Textures\\instructionTEST.jpg"
+PANTALLA_VICTORIA = r"D:\\TomasorXD\\PYTHON\Juego\\Textures\\victoryTEST.jpg"
+PANTALLA_DERROTA = r"D:\\TomasorXD\\PYTHON\Juego\\Textures\\lostTEST.jpg"
+# Rutas a imágenes personalizadas
+IMG_PERSONAJE = r"D:\\TomasorXD\\PYTHON\Juego\\Textures\\deerTEST.jpg"
+IMG_OBSTACULO = r"D:\\TomasorXD\\PYTHON\Juego\\Textures\\rockTEST.jpg"
+IMG_MANZANA = r"D:\\TomasorXD\\PYTHON\Juego\\Textures\\appleTEST.jpg"
+IMG_FONDO = r"D:\\TomasorXD\\PYTHON\Juego\\Textures\\world_mapTEST.jpg"
 
 # Para evitar que el jugador se mueva demasiado rápido
 RETRASO = 200
@@ -110,29 +115,17 @@ def poblar_tablero(tablero):
         aparecer_aleatorio(tablero, OBSTACULO,incluir_borde = False)
     aparecer_aleatorio(tablero, MANZANA)
 
-
-def refrescar_tablero(screen, tablero):
+#Cambio tomeisor: Agregué el parámetro "incluir_borde" a la función aparecer_aleatorio para que, al colocar obstáculos, no se coloquen en el borde del tablero. Esto hace que el juego sea más justo, ya que el jugador no puede quedar atrapado en una esquina sin posibilidad de movimiento. Además, modifiqué la función poblar_tablero para que los obstáculos se coloquen sin incluir el borde del tablero.
+def refrescar_tablero(screen, tablero, sprite_jugador, sprite_obstaculo, sprite_manzana, sprite_fondo):
     """
-    Dibuja el estado actual del tablero en la pantalla.
-
-    Parámetros:
-        - screen: La pantalla sobre la cual estamos dibujando.
-        - tablero: El tablero con sus posiciones actuales.
+    Dibuja el estado actual del tablero en la pantalla utilizando imágenes personalizadas.
     """
+    # Rellena el fondo
+    screen.blit(sprite_fondo, (0, 0))
 
-    # Rellena la pantalla con el color gris, básicamente pintando
-    # por encima de lo que estaba anteriormente.
-    screen.fill("gray30")
-
-    # Podemos calcular el tamaño en pixeles que tendrá cada
-    # casilla al dividir tanto la altura de la pantalla (screen.get_height())
-    # como el ancho (screen.get_width()) por la cantidad de filas y columnas respectivamente.
-    # Por ejemplo en este caso alto_elem sería 800 / 15 = 53.3, lo que nos indica que la
-    # altura de cada elemento es de 53.3 píxeles.
+    # Cálculo del tamaño de cada casilla
     alto_elem = screen.get_height() / FILAS
     ancho_elem = screen.get_width() / COLUMNAS
-    # Como el jugador es un círculo, se necesita el radio.
-    radio = ancho_elem / 2
 
     # Posición en eje "y" en unidad de píxeles.
     pos_y = 0
@@ -142,38 +135,20 @@ def refrescar_tablero(screen, tablero):
         pos_x = 0
         for j in range(COLUMNAS):
             if tablero[i][j] == OBSTACULO:
-                # Dibuja un rectángulo en la posición (pos_x, pos_y) y que sea
-                # de tamaño (ancho_elem, alto_elem) y color negro.
-                pygame.draw.rect(
-                    screen,
-                    "black",
-                    pygame.Rect((pos_x, pos_y), (ancho_elem, alto_elem)),
-                )
+                # Dibujamos el obstáculo personalizado
+                screen.blit(sprite_obstaculo, (pos_x, pos_y))
+                
             elif tablero[i][j] == JUGADOR:
-                # Dibujamos un círculo verde en la posición (pos_x + radio, pos_y + radio),
-                # con un radio definido por la variable "radio" (ancho_elem / 2).
-                pygame.draw.circle(
-                    screen,
-                    "green",
-                    (pos_x + radio, pos_y + radio),
-                    radio,
-                )
+                # Dibujamos al jugador personalizado
+                screen.blit(sprite_jugador, (pos_x, pos_y))
+                
             elif tablero[i][j] == MANZANA:
-                pygame.draw.rect(
-                    screen,
-                    "red",
-                    # Acá reducimos el tamaño del rectángulo
-                    # para identificarlo más fácilmente
-                    pygame.Rect(
-                        (pos_x + 10, pos_y + 10),
-                        (ancho_elem - 20, alto_elem - 20),
-                    ),
-                )
+                # Dibujamos la manzana personalizada
+                screen.blit(sprite_manzana, (pos_x, pos_y))
 
-            # Estamos recorriendo los píxeles de la pantalla, por lo que
-            # debemos sumar el ancho y altura en pixeles de cada elemento que
-            # ya hayamos recorrido para avanzar al siguiente.
+            # Avanzamos al siguiente elemento en el eje X
             pos_x += ancho_elem
+        # Avanzamos al siguiente elemento en el eje Y
         pos_y += alto_elem
 
     # Refresca el contenido que se ve en pantalla.
@@ -330,7 +305,8 @@ def mostrar_pantalla(screen, nombre_archivo):
         - nombre_archivo: El nombre del archivo de la imagen.
     """
 
-    ruta = os.path.join(DIR_PANTALLAS, nombre_archivo)
+    #ruta = os.path.join(DIR_PANTALLAS, nombre_archivo)
+    ruta = nombre_archivo
 
     try:
         imagen = pygame.image.load(ruta)
@@ -356,6 +332,24 @@ def main():
 
     # Establecemos el título de la ventana.
     pygame.display.set_caption("Juego Básico")
+
+    # Calculamos el tamaño exacto que debe tener cada imagen en píxeles
+    tamano_casilla = (int(screen.get_width() / COLUMNAS), int(screen.get_height() / FILAS))
+    
+    # Cargamos y escalamos los diseños para que encajen perfecto en la cuadrícula
+    try:
+        sprite_jugador = pygame.transform.scale(pygame.image.load(IMG_PERSONAJE).convert_alpha(), tamano_casilla)
+        sprite_obstaculo = pygame.transform.scale(pygame.image.load(IMG_OBSTACULO).convert_alpha(), tamano_casilla)
+        sprite_manzana = pygame.transform.scale(pygame.image.load(IMG_MANZANA).convert_alpha(), tamano_casilla)
+        # Cargamos el fondo escalado al tamaño completo de la pantalla (800x800)
+        sprite_fondo = pygame.transform.scale(pygame.image.load(IMG_FONDO).convert(), screen.get_size())
+        #imagen de pantallas
+        
+    except FileNotFoundError as e:
+        print(f"Error al cargar los sprites: {e}. Asegúrate de que existan en la carpeta.")
+        pygame.quit()
+        return
+    # ---------------------------------
 
     running = True
 
@@ -386,7 +380,7 @@ def main():
                         # Obtiene tiempo en milisegundos
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
-                        refrescar_tablero(screen, tablero)
+                        refrescar_tablero(screen, tablero, sprite_jugador, sprite_obstaculo, sprite_manzana, sprite_fondo)
                     elif evento.key == pygame.K_i:
                         estado = ESTADO_INSTRUCCIONES
                         mostrar_pantalla(screen, PANTALLA_INSTRUCCIONES)
@@ -402,7 +396,7 @@ def main():
                         direccion = (0, 0)
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
-                        refrescar_tablero(screen, tablero)
+                        refrescar_tablero(screen, tablero, sprite_jugador, sprite_obstaculo, sprite_manzana, sprite_fondo)
 
                     if evento.key == pygame.K_ESCAPE:
                         estado = ESTADO_INICIO
@@ -427,7 +421,7 @@ def main():
                     mostrar_pantalla(screen, PANTALLA_VICTORIA)
                 else:
                     tiempo_ultimo_mov = tiempo_actual
-                    refrescar_tablero(screen, tablero)
+                    refrescar_tablero(screen, tablero, sprite_jugador, sprite_obstaculo, sprite_manzana, sprite_fondo)
 
     pygame.quit()
 
