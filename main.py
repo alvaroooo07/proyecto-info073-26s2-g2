@@ -29,7 +29,7 @@ PANTALLA_VICTORIA = os.path.join(DIR_TEXTURAS, "victoryTEST.jpg")
 PANTALLA_DERROTA = os.path.join(DIR_TEXTURAS, "lostTEST.jpg")
 
 # Rutas a imágenes personalizadas
-IMG_PERSONAJE = os.path.join(DIR_TEXTURAS, "deerTEST.jpg")
+IMG_PERSONAJE = os.path.join(DIR_TEXTURAS, "deerTEST.png")
 IMG_OBSTACULO = os.path.join(DIR_TEXTURAS, "rockTEST.jpg")
 IMG_MANZANA = os.path.join(DIR_TEXTURAS, "appleTEST.jpg")
 IMG_FONDO = os.path.join(DIR_TEXTURAS, "world_mapTEST.jpg")
