@@ -3,6 +3,7 @@ import os
 import random
 import pygame.image
 import pygame
+import sys
 
 # Estados del juego
 ESTADO_INICIO = "inicio"
@@ -14,17 +15,24 @@ ESTADO_VICTORIA = "victoria"
 # Rutas a la carpeta de imágenes de pantallas
 DIR_PANTALLAS = os.path.join(os.path.dirname(__file__), "data", "pantallas")
 
-# Se específica el nombre del archivo para cada imagen de pantalla.
+# 1. Detectar automáticamente la carpeta donde está guardado este script (.py)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# 2. Apuntar a una carpeta dentro de tu proyecto (por ejemplo: "Textures")
+DIR_TEXTURAS = os.path.join(BASE_DIR, "Textures")
+
 # El formato de imagen utilizado puede ser PNG, JPG/JPEG, BMP, o GIF.
-PANTALLA_INICIO = r"D:\\TomasorXD\\PYTHON\Juego\\Textures\\inicioTEST.jpg"
-PANTALLA_INSTRUCCIONES = r"D:\\TomasorXD\\PYTHON\Juego\\Textures\\instructionTEST.jpg"
-PANTALLA_VICTORIA = r"D:\\TomasorXD\\PYTHON\Juego\\Textures\\victoryTEST.jpg"
-PANTALLA_DERROTA = r"D:\\TomasorXD\\PYTHON\Juego\\Textures\\lostTEST.jpg"
+# Se específica el nombre de la ruta combinando el directorio base y el archivo.
+PANTALLA_INICIO = os.path.join(DIR_TEXTURAS, "inicioTEST.jpg")
+PANTALLA_INSTRUCCIONES = os.path.join(DIR_TEXTURAS, "instructionTEST.jpg")
+PANTALLA_VICTORIA = os.path.join(DIR_TEXTURAS, "victoryTEST.jpg")
+PANTALLA_DERROTA = os.path.join(DIR_TEXTURAS, "lostTEST.jpg")
+
 # Rutas a imágenes personalizadas
-IMG_PERSONAJE = r"D:\\TomasorXD\\PYTHON\Juego\\Textures\\deerTEST.jpg"
-IMG_OBSTACULO = r"D:\\TomasorXD\\PYTHON\Juego\\Textures\\rockTEST.jpg"
-IMG_MANZANA = r"D:\\TomasorXD\\PYTHON\Juego\\Textures\\appleTEST.jpg"
-IMG_FONDO = r"D:\\TomasorXD\\PYTHON\Juego\\Textures\\world_mapTEST.jpg"
+IMG_PERSONAJE = os.path.join(DIR_TEXTURAS, "deerTEST.jpg")
+IMG_OBSTACULO = os.path.join(DIR_TEXTURAS, "rockTEST.jpg")
+IMG_MANZANA = os.path.join(DIR_TEXTURAS, "appleTEST.jpg")
+IMG_FONDO = os.path.join(DIR_TEXTURAS, "world_mapTEST.jpg")
 
 # Para evitar que el jugador se mueva demasiado rápido
 RETRASO = 200
