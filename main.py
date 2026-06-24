@@ -20,18 +20,26 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # 2. Apuntar a una carpeta dentro de tu proyecto (por ejemplo: "Textures")
 DIR_TEXTURAS = os.path.join(BASE_DIR, "Textures")
+# NUEVO: Ruta hacia la subcarpeta de animaciones del ciervo
+DIR_ANIM_CIERVO = os.path.join(DIR_TEXTURAS, "animacion ciervo")
 
 # El formato de imagen utilizado puede ser PNG, JPG/JPEG, BMP, o GIF.
 # Se específica el nombre de la ruta combinando el directorio base y el archivo.
-PANTALLA_INICIO = os.path.join(DIR_TEXTURAS, "inicioTEST.jpg")
+PANTALLA_INICIO = os.path.join(DIR_TEXTURAS, "Pant_Inicio.png")
 PANTALLA_INSTRUCCIONES = os.path.join(DIR_TEXTURAS, "instructionTEST.jpg")
-PANTALLA_VICTORIA = os.path.join(DIR_TEXTURAS, "victoryTEST.jpg")
-PANTALLA_DERROTA = os.path.join(DIR_TEXTURAS, "lostTEST.jpg")
+PANTALLA_VICTORIA = os.path.join(DIR_TEXTURAS, "Pant_Victoria.png")
+PANTALLA_DERROTA = os.path.join(DIR_TEXTURAS, "Pant_Muerte.png")
 
 # Rutas a imágenes personalizadas
-IMG_PERSONAJE = os.path.join(DIR_TEXTURAS, "deerTEST.png")
-IMG_OBSTACULO = os.path.join(DIR_TEXTURAS, "rockTEST.jpg")
-IMG_MANZANA = os.path.join(DIR_TEXTURAS, "appleTEST.jpg")
+IMG_JUGADOR_ANIM = {
+    (0, 1):  [os.path.join(DIR_ANIM_CIERVO, "deer_down_1.png"),  os.path.join(DIR_ANIM_CIERVO, "deer_down_2.png")],
+    (0, -1): [os.path.join(DIR_ANIM_CIERVO, "deer_up_1.png"),    os.path.join(DIR_ANIM_CIERVO, "deer_up_2.png")],
+    (-1, 0): [os.path.join(DIR_ANIM_CIERVO, "deer_left_1.png"),  os.path.join(DIR_ANIM_CIERVO, "deer_left_2.png")],
+    (1, 0):  [os.path.join(DIR_ANIM_CIERVO, "deer_right_1.png"), os.path.join(DIR_ANIM_CIERVO, "deer_right_2.png")],
+    (0, 0):  [os.path.join(DIR_ANIM_CIERVO, "deer_down_1.png"),  os.path.join(DIR_ANIM_CIERVO, "deer_down_2.png")] # Por defecto mirando abajo
+}
+IMG_OBSTACULO = os.path.join(DIR_TEXTURAS, "rockTEST.png")
+IMG_MANZANA = os.path.join(DIR_TEXTURAS, "appleTEST.png")
 IMG_FONDO = os.path.join(DIR_TEXTURAS, "world_mapTEST.jpg")
 
 # Para evitar que el jugador se mueva demasiado rápido
@@ -124,42 +132,36 @@ def poblar_tablero(tablero):
     aparecer_aleatorio(tablero, MANZANA)
 
 #Cambio tomeisor: Agregué el parámetro "incluir_borde" a la función aparecer_aleatorio para que, al colocar obstáculos, no se coloquen en el borde del tablero. Esto hace que el juego sea más justo, ya que el jugador no puede quedar atrapado en una esquina sin posibilidad de movimiento. Además, modifiqué la función poblar_tablero para que los obstáculos se coloquen sin incluir el borde del tablero.
-def refrescar_tablero(screen, tablero, sprite_jugador, sprite_obstaculo, sprite_manzana, sprite_fondo):
+def refrescar_tablero(screen, tablero, sprites_jugador_dict, sprite_obstaculo, sprite_manzana, sprite_fondo, direccion, frame_actual):
     """
     Dibuja el estado actual del tablero en la pantalla utilizando imágenes personalizadas.
     """
-    # Rellena el fondo
     screen.blit(sprite_fondo, (0, 0))
 
-    # Cálculo del tamaño de cada casilla
     alto_elem = screen.get_height() / FILAS
     ancho_elem = screen.get_width() / COLUMNAS
 
-    # Posición en eje "y" en unidad de píxeles.
     pos_y = 0
-
     for i in range(FILAS):
-        # Posición en eje "x" en unidad de píxeles.
         pos_x = 0
         for j in range(COLUMNAS):
             if tablero[i][j] == OBSTACULO:
-                # Dibujamos el obstáculo personalizado
                 screen.blit(sprite_obstaculo, (pos_x, pos_y))
                 
             elif tablero[i][j] == JUGADOR:
-                # Dibujamos al jugador personalizado
-                screen.blit(sprite_jugador, (pos_x, pos_y))
+                # 1. Obtenemos la lista de animaciones para la dirección actual
+                lista_animacion = sprites_jugador_dict.get(direccion, sprites_jugador_dict[(0, 0)])
+                # 2. Seleccionamos el frame correspondiente (0 o 1)
+                sprite_actual_jugador = lista_animacion[frame_actual]
+                # 3. Dibujamos el sprite correcto
+                screen.blit(sprite_actual_jugador, (pos_x, pos_y))
                 
             elif tablero[i][j] == MANZANA:
-                # Dibujamos la manzana personalizada
                 screen.blit(sprite_manzana, (pos_x, pos_y))
 
-            # Avanzamos al siguiente elemento en el eje X
             pos_x += ancho_elem
-        # Avanzamos al siguiente elemento en el eje Y
         pos_y += alto_elem
 
-    # Refresca el contenido que se ve en pantalla.
     pygame.display.flip()
 
 
@@ -335,60 +337,61 @@ def mostrar_pantalla(screen, nombre_archivo):
 def main():
     pygame.init()
 
-    # Establecemos la resolución de la pantalla.
     screen = pygame.display.set_mode((800, 800))
-
-    # Establecemos el título de la ventana.
     pygame.display.set_caption("Juego Básico")
 
-    # Calculamos el tamaño exacto que debe tener cada imagen en píxeles
     tamano_casilla = (int(screen.get_width() / COLUMNAS), int(screen.get_height() / FILAS))
     
-    # Cargamos y escalamos los diseños para que encajen perfecto en la cuadrícula
+    # DICCIONARIO PARA GUARDAR LOS SPRITES YA PROCESADOS
+    sprites_jugador_escalados = {}
+
     try:
-        sprite_jugador = pygame.transform.scale(pygame.image.load(IMG_PERSONAJE).convert_alpha(), tamano_casilla)
+        # CARGA Y ESCALA DE ANIMACIONES DEL JUGADOR
+        # Iteramos sobre nuestro diccionario de rutas para cargarlas todas en memoria de forma eficiente
+        for dir_tupla, rutas_lista in IMG_JUGADOR_ANIM.items():
+            sprites_jugador_escalados[dir_tupla] = [
+                pygame.transform.scale(pygame.image.load(ruta).convert_alpha(), tamano_casilla)
+                for ruta in rutas_lista
+            ]
+
         sprite_obstaculo = pygame.transform.scale(pygame.image.load(IMG_OBSTACULO).convert_alpha(), tamano_casilla)
         sprite_manzana = pygame.transform.scale(pygame.image.load(IMG_MANZANA).convert_alpha(), tamano_casilla)
-        # Cargamos el fondo escalado al tamaño completo de la pantalla (800x800)
         sprite_fondo = pygame.transform.scale(pygame.image.load(IMG_FONDO).convert(), screen.get_size())
-        #imagen de pantallas
         
     except FileNotFoundError as e:
         print(f"Error al cargar los sprites: {e}. Asegúrate de que existan en la carpeta.")
         pygame.quit()
         return
-    # ---------------------------------
 
     running = True
-
     estado = ESTADO_INICIO
     tablero = []
     pos_jugador = (0, 0)
     direccion = (0, 0)
     tiempo_ultimo_mov = 0
     manzanas_comidas = 0
+    
+    # NUEVA VARIABLE: Controla cuál frame de la animación mostrar (0 o 1)
+    frame_actual = 0
+
     mostrar_pantalla(screen, PANTALLA_INICIO)
 
-    # Este es el bucle principal del juego, todo lo que sucede en el juego
-    # está aquí.
     while running:
-        # Se analizan los eventos del bucle actual.
         for evento in pygame.event.get():
-            # Si es que se quiere cerrar la ventana.
             if evento.type == pygame.QUIT:
                 running = False
 
-            # Si es que se presiona alguna tecla.
             if evento.type == pygame.KEYDOWN:
                 if estado == ESTADO_INICIO:
                     if evento.key == pygame.K_SPACE:
                         tablero, pos_jugador = reiniciar()
                         manzanas_comidas = 0
                         direccion = (0, 0)
-                        # Obtiene tiempo en milisegundos
+                        frame_actual = 0 # Inicializar frame
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
-                        refrescar_tablero(screen, tablero, sprite_jugador, sprite_obstaculo, sprite_manzana, sprite_fondo)
+                        # Se añade 'direccion' y 'frame_actual' a los argumentos
+                        refrescar_tablero(screen, tablero, sprites_jugador_escalados, sprite_obstaculo, sprite_manzana, sprite_fondo, direccion, frame_actual)
                     elif evento.key == pygame.K_i:
                         estado = ESTADO_INSTRUCCIONES
                         mostrar_pantalla(screen, PANTALLA_INSTRUCCIONES)
@@ -400,11 +403,12 @@ def main():
                 elif estado in (ESTADO_DERROTA, ESTADO_VICTORIA):
                     if evento.key == pygame.K_r:
                         tablero, pos_jugador = reiniciar()
-                        manzanas_comidas= 0
+                        manzanas_comidas = 0
                         direccion = (0, 0)
+                        frame_actual = 0
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
-                        refrescar_tablero(screen, tablero, sprite_jugador, sprite_obstaculo, sprite_manzana, sprite_fondo)
+                        refrescar_tablero(screen, tablero, sprites_jugador_escalados, sprite_obstaculo, sprite_manzana, sprite_fondo, direccion, frame_actual)
 
                     if evento.key == pygame.K_ESCAPE:
                         estado = ESTADO_INICIO
@@ -414,12 +418,10 @@ def main():
                     direccion = cambiar_direccion(pygame.key.get_pressed(), direccion)
 
         if estado == ESTADO_JUGANDO:
-            tiempo_actual = pygame.time.get_ticks()  # En milisegundos
+            tiempo_actual = pygame.time.get_ticks()
 
-            # La variable RETRASO hace que si no han pasado esa cantidad de ticks,
-            # entonces no se avanzará en el tablero.
             if direccion != (0, 0) and tiempo_actual - tiempo_ultimo_mov >= RETRASO:
-                resultado, pos_jugador, manzanas_comidas = avanzar (tablero, pos_jugador, direccion, manzanas_comidas)
+                resultado, pos_jugador, manzanas_comidas = avanzar(tablero, pos_jugador, direccion, manzanas_comidas)
 
                 if resultado == "derrota":
                     estado = ESTADO_DERROTA
@@ -429,7 +431,11 @@ def main():
                     mostrar_pantalla(screen, PANTALLA_VICTORIA)
                 else:
                     tiempo_ultimo_mov = tiempo_actual
-                    refrescar_tablero(screen, tablero, sprite_jugador, sprite_obstaculo, sprite_manzana, sprite_fondo)
+                    
+                    # LOGICA DE ANIMACIÓN: Alterna entre el frame 0 y 1 en cada movimiento exitoso
+                    frame_actual = 1 - frame_actual 
+                    
+                    refrescar_tablero(screen, tablero, sprites_jugador_escalados, sprite_obstaculo, sprite_manzana, sprite_fondo, direccion, frame_actual)
 
     pygame.quit()
 
