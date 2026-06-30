@@ -50,6 +50,7 @@ VACIO = 0
 OBSTACULO = 1
 JUGADOR = 2
 MANZANA = 3
+TRONCO = 4
 
 # Tamaño del tablero
 # Si se cambian estas constantes, se debe modificar la definición
@@ -57,7 +58,6 @@ MANZANA = 3
 FILAS = 15
 COLUMNAS = 15
 MANZANAS_PARA_GANAR = 5
-
 
 def aparecer_aleatorio(tablero, id_elem, incluir_borde = True):
     """
@@ -118,6 +118,18 @@ def aparecer_aleatorio(tablero, id_elem, incluir_borde = True):
 
     return columna, fila
 
+#creamos una funcion para que aparezca un tronco de 1x2 en el tablero si no lo puede colocar se elimina el primer bloque y se intenta nuevamente
+def aparecer_tronco(tablero):
+    while True:
+        columna, fila = aparecer_aleatorio(tablero, OBSTACULO, incluir_borde=False)
+
+        # Si la casilla de la derecha está libre, forma un tronco 1x2
+        if columna + 1 < COLUMNAS and tablero[fila][columna + 1] == VACIO:
+            tablero[fila][columna + 1] = OBSTACULO
+            break
+
+        # Si no se pudo, elimina el primer bloque e intenta nuevamente
+        tablero[fila][columna] = VACIO
 
 def poblar_tablero(tablero):
     """
@@ -127,6 +139,9 @@ def poblar_tablero(tablero):
         - tablero: El tablero con sus posiciones actuales.
     """
     CANT_OBSTACULOS = 10
+    cantidad_troncos = 5
+    for i in range ( cantidad_troncos ) :
+        aparecer_tronco(tablero)
     for i in range ( CANT_OBSTACULOS ) :
         aparecer_aleatorio(tablero, OBSTACULO,incluir_borde = False)
     aparecer_aleatorio(tablero, MANZANA)
