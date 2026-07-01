@@ -92,12 +92,36 @@ JUGADOR = 2
 MANZANA = 3
 TRONCO = 4
 
+#Tamaño de la ventana
+ANCHO_VENTANA = 1040
+ALTO_VENTANA = 800
+LADO_TABLERO = 800
+ANCHO_PANEL = ANCHO_VENTANA - LADO_TABLERO
+
 # Tamaño del tablero
 # Si se cambian estas constantes, se debe modificar la definición
 # del tablero que se encuentra en función reiniciar().
 FILAS = 15
 COLUMNAS = 15
+
+# Condiciones para ganar
 MANZANAS_PARA_GANAR = 10
+
+def dibujar_panel(screen,fuente,manzanas_comidas):
+    #rectangulo del panel: empieza donde termina el tablero.
+    panel = pygame.Rect(LADO_TABLERO, 0 , ANCHO_PANEL , ALTO_VENTANA)
+    pygame.draw.rect(screen, "gray15" , panel)
+
+    # Margen izquierdo del texto dentro del panel
+    x = LADO_TABLERO + 24
+
+    # Titulo
+    titulo = fuente.render("DEAR DEER" , True , "white")
+    screen.blit(titulo, (x,30))
+
+    # Contador de manzanas actuales
+    contador_txt = fuente.render(f"Manzanas: {manzanas_comidas}", True, "white")
+    screen.blit(contador_txt , (x,100))
 
 def aparecer_aleatorio(tablero, id_elem, incluir_borde = True):
     """
@@ -187,11 +211,11 @@ def poblar_tablero(tablero):
     aparecer_aleatorio(tablero, MANZANA)
 
 #Cambio tomeisor: Agregué el parámetro "incluir_borde" a la función aparecer_aleatorio para que, al colocar obstáculos, no se coloquen en el borde del tablero. Esto hace que el juego sea más justo, ya que el jugador no puede quedar atrapado en una esquina sin posibilidad de movimiento. Además, modifiqué la función poblar_tablero para que los obstáculos se coloquen sin incluir el borde del tablero.
-def refrescar_tablero(screen, tablero, sprites_cabeza, sprite_cuerpo_x, sprite_cuerpo_y, sprite_cuerpo_esquina, sprites_trasero, sprites_compacto, sprite_obstaculo, sprite_tronco_izq, sprite_tronco_der, sprite_manzana, sprite_fondo, direccion, frame_actual, pos_cuerpo):
+def refrescar_tablero(screen, tablero, sprites_cabeza, sprite_cuerpo_x, sprite_cuerpo_y, sprite_cuerpo_esquina, sprites_trasero, sprites_compacto, sprite_obstaculo, sprite_tronco_izq, sprite_tronco_der, sprite_manzana, sprite_fondo, direccion, frame_actual, pos_cuerpo, manzanas_comidas, fuente):
     # ETAPA 1: Dibujar el fondo
     screen.blit(sprite_fondo, (0, 0))
-    alto_elem = screen.get_height() / FILAS
-    ancho_elem = screen.get_width() / COLUMNAS
+    alto_elem = LADO_TABLERO / FILAS
+    ancho_elem = LADO_TABLERO / COLUMNAS
 
     # ETAPA 2: Dibujar elementos estáticos del mapa
     for i in range(FILAS):
@@ -288,6 +312,9 @@ def refrescar_tablero(screen, tablero, sprites_cabeza, sprite_cuerpo_x, sprite_c
                         esquina_rotada = sprite_cuerpo_esquina # Fallback por seguridad
                         
                     screen.blit(esquina_rotada, (pos_x, pos_y))
+                    
+    # Se agrega el panel a la ventana de juego
+    dibujar_panel(screen, fuente, manzanas_comidas)
 
     pygame.display.flip()
 
@@ -459,7 +486,7 @@ def mostrar_pantalla(screen, nombre_archivo):
 
     try:
         imagen = pygame.image.load(ruta)
-        imagen = pygame.transform.scale(imagen, screen.get_size())
+        imagen = pygame.transform.scale(imagen, (LADO_TABLERO, ALTO_VENTANA))
 
         # Dibujamos la imagen en la pantalla en la coordenada (0, 0).
         screen.blit(imagen, (0, 0))
@@ -476,10 +503,16 @@ def mostrar_pantalla(screen, nombre_archivo):
 def main():
     pygame.init()
 
-    screen = pygame.display.set_mode((800, 800))
-    pygame.display.set_caption("Juego Básico")
+    #Establecemos la resolucion de la pantalla.
+    screen = pygame.display.set_mode((ANCHO_VENTANA, ALTO_VENTANA))
+    
+    # Establecemos la fuente que aparecera en el panel
+    fuente = pygame.font.SysFont("Courier New", 30)
 
-    tamano_casilla = (int(screen.get_width() / COLUMNAS), int(screen.get_height() / FILAS))
+    #Establecemos el titulo de la ventana
+    pygame.display.set_caption("DEAR DEER")
+
+    tamano_casilla = (int(LADO_TABLERO / COLUMNAS), int(ALTO_VENTANA / FILAS))
     
     # DICCIONARIO PARA GUARDAR LOS SPRITES YA PROCESADOS
     sprites_jugador_escalados = {}
@@ -507,7 +540,7 @@ def main():
         # CORRECCIÓN: Cargar los sprites individuales que faltaban
         sprite_obstaculo = pygame.transform.scale(pygame.image.load(IMG_OBSTACULO).convert_alpha(), tamano_casilla)
         sprite_manzana = pygame.transform.scale(pygame.image.load(IMG_MANZANA).convert_alpha(), tamano_casilla)
-        sprite_fondo = pygame.transform.scale(pygame.image.load(IMG_FONDO).convert(), screen.get_size())
+        sprite_fondo = pygame.transform.scale(pygame.image.load(IMG_FONDO).convert(), (LADO_TABLERO, ALTO_VENTANA))
         
         # --- NUEVOS SPRITES CARGADOS ---
         # Carga de variaciones del lomo/cuerpo
@@ -564,7 +597,7 @@ def main():
                         # Arreglo de Bug: Limpia cualquier tecla WASD que se haya quedado grabada en el búfer antes de empezar
                         pygame.event.clear(pygame.KEYDOWN) 
                         
-                        refrescar_tablero(screen, tablero, sprites_cabeza, sprite_cuerpo_x, sprite_cuerpo_y, sprite_cuerpo_esquina, sprites_trasero, sprites_compacto, sprite_obstaculo, sprite_tronco_izq, sprite_tronco_der, sprite_manzana, sprite_fondo, direccion, frame_actual, pos_cuerpo)
+                        refrescar_tablero(screen, tablero, sprites_cabeza, sprite_cuerpo_x, sprite_cuerpo_y, sprite_cuerpo_esquina, sprites_trasero, sprites_compacto, sprite_obstaculo, sprite_tronco_izq, sprite_tronco_der, sprite_manzana, sprite_fondo, direccion, frame_actual, pos_cuerpo, manzanas_comidas, fuente)
                     elif evento.key == pygame.K_i:
                         estado = ESTADO_INSTRUCCIONES
                         mostrar_pantalla(screen, PANTALLA_INSTRUCCIONES)
@@ -585,7 +618,7 @@ def main():
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
                         pygame.event.clear(pygame.KEYDOWN) # También limpiamos al reiniciar
-                        refrescar_tablero(screen, tablero, sprites_cabeza, sprite_cuerpo_x, sprite_cuerpo_y, sprite_cuerpo_esquina, sprites_trasero, sprites_compacto, sprite_obstaculo, sprite_tronco_izq, sprite_tronco_der, sprite_manzana, sprite_fondo, direccion, frame_actual, pos_cuerpo)
+                        refrescar_tablero(screen, tablero, sprites_cabeza, sprite_cuerpo_x, sprite_cuerpo_y, sprite_cuerpo_esquina, sprites_trasero, sprites_compacto, sprite_obstaculo, sprite_tronco_izq, sprite_tronco_der, sprite_manzana, sprite_fondo, direccion, frame_actual, pos_cuerpo, manzanas_comidas, fuente)
                     if evento.key == pygame.K_ESCAPE:
                         estado = ESTADO_INICIO
                         mostrar_pantalla(screen, PANTALLA_INICIO)
@@ -617,7 +650,7 @@ def main():
                     frame_actual = 1 - frame_actual 
                     paso_procesado = True  
                     
-                    refrescar_tablero(screen, tablero, sprites_cabeza, sprite_cuerpo_x, sprite_cuerpo_y, sprite_cuerpo_esquina, sprites_trasero, sprites_compacto, sprite_obstaculo, sprite_tronco_izq, sprite_tronco_der, sprite_manzana, sprite_fondo, direccion, frame_actual, pos_cuerpo)
+                    refrescar_tablero(screen, tablero, sprites_cabeza, sprite_cuerpo_x, sprite_cuerpo_y, sprite_cuerpo_esquina, sprites_trasero, sprites_compacto, sprite_obstaculo, sprite_tronco_izq, sprite_tronco_der, sprite_manzana, sprite_fondo, direccion, frame_actual, pos_cuerpo, manzanas_comidas, fuente)
 
     pygame.quit()
 
