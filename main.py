@@ -15,33 +15,73 @@ ESTADO_VICTORIA = "victoria"
 # Rutas a la carpeta de imágenes de pantallas
 DIR_PANTALLAS = os.path.join(os.path.dirname(__file__), "data", "pantallas")
 
-# 1. Detectar automáticamente la carpeta donde está guardado este script (.py)
+# Detecta automáticamente la carpeta donde está guardado este script (.py)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# 2. Apuntar a una carpeta dentro de tu proyecto (por ejemplo: "Textures")
-DIR_TEXTURAS = os.path.join(BASE_DIR, "Textures")
+# Apunta a una carpeta dentro de "main"
+
+DIR_TEXTURAS = os.path.join(BASE_DIR, "textures")
+
 # NUEVO: Ruta hacia la subcarpeta de animaciones del ciervo
-DIR_ANIM_CIERVO = os.path.join(DIR_TEXTURAS, "animacion ciervo")
+
+DIR_CUERPO_CIERVO = os.path.join(DIR_TEXTURAS, "cuerpo ciervo") #carpeta para las nuevas texturas del cuerpo del ciervo (cuando se alarga)
+DIR_CUERPO_TRONCO = os.path.join(DIR_TEXTURAS, "cuerpo tronco") #Carpeta para las nuevas texturas del tronco
+
+#--- Direcciones animaciones ciervo ---
+
+DIR_CIERVO_PRINCIPAL = os.path.join(DIR_TEXTURAS, "animaciones ciervo") #Carpeta para las animaciones del ciervo inicial
+DIR_ANIM_CABEZA = os.path.join(DIR_CIERVO_PRINCIPAL, "animacion cabeza") #Carpeta para las animaciones de la cabeza ciervo 
+DIR_ANIM_TRASERO = os.path.join(DIR_CIERVO_PRINCIPAL, "animacion trasero") #Carpeta para las animaciones del trasero ciervo 
+DIR_ANIM_COMPACTO = os.path.join(DIR_CIERVO_PRINCIPAL, "animacion compacto") #Carpeta para las animaciones del ciervo compacto inicial
 
 # El formato de imagen utilizado puede ser PNG, JPG/JPEG, BMP, o GIF.
 # Se específica el nombre de la ruta combinando el directorio base y el archivo.
 PANTALLA_INICIO = os.path.join(DIR_TEXTURAS, "Pant_Inicio.png")
-PANTALLA_INSTRUCCIONES = os.path.join(DIR_TEXTURAS, "instructionTEST.jpg")
+PANTALLA_INSTRUCCIONES = os.path.join(DIR_TEXTURAS, "instructionTEST.jpg") #
 PANTALLA_VICTORIA = os.path.join(DIR_TEXTURAS, "Pant_Victoria.png")
 PANTALLA_DERROTA = os.path.join(DIR_TEXTURAS, "Pant_Muerte.png")
 
 # Rutas a imágenes personalizadas
+# --- ANIMACIONES DE LA CABEZA ---
 IMG_JUGADOR_ANIM = {
-    (0, 1):  [os.path.join(DIR_ANIM_CIERVO, "deer_down_1.png"),  os.path.join(DIR_ANIM_CIERVO, "deer_down_2.png")],
-    (0, -1): [os.path.join(DIR_ANIM_CIERVO, "deer_up_1.png"),    os.path.join(DIR_ANIM_CIERVO, "deer_up_2.png")],
-    (-1, 0): [os.path.join(DIR_ANIM_CIERVO, "deer_left_1.png"),  os.path.join(DIR_ANIM_CIERVO, "deer_left_2.png")],
-    (1, 0):  [os.path.join(DIR_ANIM_CIERVO, "deer_right_1.png"), os.path.join(DIR_ANIM_CIERVO, "deer_right_2.png")],
-    (0, 0):  [os.path.join(DIR_ANIM_CIERVO, "deer_down_1.png"),  os.path.join(DIR_ANIM_CIERVO, "deer_down_2.png")] # Por defecto mirando abajo
+    (0, 1):  [os.path.join(DIR_ANIM_CABEZA, "deer_down_1.png"),  os.path.join(DIR_ANIM_CABEZA, "deer_down_2.png")],
+    (0, -1): [os.path.join(DIR_ANIM_CABEZA, "deer_up_1.png"),    os.path.join(DIR_ANIM_CABEZA, "deer_up_2.png")],
+    (-1, 0): [os.path.join(DIR_ANIM_CABEZA, "deer_left_1.png"),  os.path.join(DIR_ANIM_CABEZA, "deer_left_2.png")],
+    (1, 0):  [os.path.join(DIR_ANIM_CABEZA, "deer_right_1.png"), os.path.join(DIR_ANIM_CABEZA, "deer_right_2.png")],
+    (0, 0):  [os.path.join(DIR_ANIM_CABEZA, "deer_down_1.png"),  os.path.join(DIR_ANIM_CABEZA, "deer_down_2.png")]
 }
-IMG_OBSTACULO = os.path.join(DIR_TEXTURAS, "rockTEST.png")
-IMG_MANZANA = os.path.join(DIR_TEXTURAS, "appleTEST.png")
-IMG_FONDO = os.path.join(DIR_TEXTURAS, "world_mapTEST.jpg")
 
+# --- ANIMACIONES DEL TRASERO ---
+IMG_TRASERO_ANIM = {
+    (0, 1):  [os.path.join(DIR_ANIM_TRASERO, "tail_down_1.png"),  os.path.join(DIR_ANIM_TRASERO, "tail_down_2.png")],
+    (0, -1): [os.path.join(DIR_ANIM_TRASERO, "tail_up_1.png"),    os.path.join(DIR_ANIM_TRASERO, "tail_up_2.png")],
+    (-1, 0): [os.path.join(DIR_ANIM_TRASERO, "tail_left_1.png"),  os.path.join(DIR_ANIM_TRASERO, "tail_left_2.png")],
+    (1, 0):  [os.path.join(DIR_ANIM_TRASERO, "tail_right_1.png"), os.path.join(DIR_ANIM_TRASERO, "tail_right_2.png")],
+    (0, 0):  [os.path.join(DIR_ANIM_TRASERO, "tail_down_1.png"),  os.path.join(DIR_ANIM_TRASERO, "tail_down_2.png")]
+}
+
+IMG_OBSTACULO = os.path.join(DIR_TEXTURAS, "rock.png")
+IMG_MANZANA = os.path.join(DIR_TEXTURAS, "apple.png") 
+IMG_FONDO = os.path.join(DIR_TEXTURAS, "World_Map.png")
+
+# --- NUEVOS SPRITES FIJOS ---
+# --- NUEVAS TEXTURAS DEL CUERPO ---
+IMG_CUERPO_X = os.path.join(DIR_CUERPO_CIERVO, "body_x.png")       # Lomo horizontal
+IMG_CUERPO_Y = os.path.join(DIR_CUERPO_CIERVO, "body_y.png")       # Lomo vertical
+IMG_CUERPO_ESQUINA = os.path.join(DIR_CUERPO_CIERVO, "body_corner.png") # Para los giros
+
+# --- NUEVAS TEXTURAS DEL TRONCO ---
+IMG_TRONCO_IZQ = os.path.join(DIR_CUERPO_TRONCO, "tronco_izq.png")   # Mitad izquierda
+IMG_TRONCO_DER = os.path.join(DIR_CUERPO_TRONCO, "tronco_der.png")   # Mitad derecha
+
+# --- Animacion INICIAL (COMPACTO) ---
+IMG_COMPACTO_ANIM = {
+    (0, 1):  [os.path.join(DIR_ANIM_COMPACTO, "com_deer_down_1.png"),  os.path.join(DIR_ANIM_COMPACTO, "com_deer_down_2.png")],
+    (0, -1): [os.path.join(DIR_ANIM_COMPACTO, "com_deer_up_1.png"),    os.path.join(DIR_ANIM_COMPACTO, "com_deer_up_2.png")],
+    (-1, 0): [os.path.join(DIR_ANIM_COMPACTO, "com_deer_left_1.png"),  os.path.join(DIR_ANIM_COMPACTO, "com_deer_left_2.png")],
+    (1, 0):  [os.path.join(DIR_ANIM_COMPACTO, "com_deer_right_1.png"), os.path.join(DIR_ANIM_COMPACTO, "com_deer_right_2.png")],
+    (0, 0):  [os.path.join(DIR_ANIM_COMPACTO, "com_deer_down_1.png"),  os.path.join(DIR_ANIM_COMPACTO, "com_deer_down_2.png")]
+}
 # Para evitar que el jugador se mueva demasiado rápido
 RETRASO = 200
 
@@ -57,7 +97,7 @@ TRONCO = 4
 # del tablero que se encuentra en función reiniciar().
 FILAS = 15
 COLUMNAS = 15
-MANZANAS_PARA_GANAR = 5
+MANZANAS_PARA_GANAR = 10
 
 def aparecer_aleatorio(tablero, id_elem, incluir_borde = True):
     """
@@ -121,11 +161,11 @@ def aparecer_aleatorio(tablero, id_elem, incluir_borde = True):
 #creamos una funcion para que aparezca un tronco de 1x2 en el tablero si no lo puede colocar se elimina el primer bloque y se intenta nuevamente
 def aparecer_tronco(tablero):
     while True:
-        columna, fila = aparecer_aleatorio(tablero, OBSTACULO, incluir_borde=False)
+        columna, fila = aparecer_aleatorio(tablero, TRONCO, incluir_borde=False)
 
         # Si la casilla de la derecha está libre, forma un tronco 1x2
         if columna + 1 < COLUMNAS and tablero[fila][columna + 1] == VACIO:
-            tablero[fila][columna + 1] = OBSTACULO
+            tablero[fila][columna + 1] = TRONCO
             break
 
         # Si no se pudo, elimina el primer bloque e intenta nuevamente
@@ -147,35 +187,107 @@ def poblar_tablero(tablero):
     aparecer_aleatorio(tablero, MANZANA)
 
 #Cambio tomeisor: Agregué el parámetro "incluir_borde" a la función aparecer_aleatorio para que, al colocar obstáculos, no se coloquen en el borde del tablero. Esto hace que el juego sea más justo, ya que el jugador no puede quedar atrapado en una esquina sin posibilidad de movimiento. Además, modifiqué la función poblar_tablero para que los obstáculos se coloquen sin incluir el borde del tablero.
-def refrescar_tablero(screen, tablero, sprites_jugador_dict, sprite_obstaculo, sprite_manzana, sprite_fondo, direccion, frame_actual):
-    """
-    Dibuja el estado actual del tablero en la pantalla utilizando imágenes personalizadas.
-    """
+def refrescar_tablero(screen, tablero, sprites_cabeza, sprite_cuerpo_x, sprite_cuerpo_y, sprite_cuerpo_esquina, sprites_trasero, sprites_compacto, sprite_obstaculo, sprite_tronco_izq, sprite_tronco_der, sprite_manzana, sprite_fondo, direccion, frame_actual, pos_cuerpo):
+    # ETAPA 1: Dibujar el fondo
     screen.blit(sprite_fondo, (0, 0))
-
     alto_elem = screen.get_height() / FILAS
     ancho_elem = screen.get_width() / COLUMNAS
 
-    pos_y = 0
+    # ETAPA 2: Dibujar elementos estáticos del mapa
     for i in range(FILAS):
-        pos_x = 0
         for j in range(COLUMNAS):
+            pos_x = j * ancho_elem
+            pos_y = i * alto_elem
+            
             if tablero[i][j] == OBSTACULO:
                 screen.blit(sprite_obstaculo, (pos_x, pos_y))
                 
-            elif tablero[i][j] == JUGADOR:
-                # 1. Obtenemos la lista de animaciones para la dirección actual
-                lista_animacion = sprites_jugador_dict.get(direccion, sprites_jugador_dict[(0, 0)])
-                # 2. Seleccionamos el frame correspondiente (0 o 1)
-                sprite_actual_jugador = lista_animacion[frame_actual]
-                # 3. Dibujamos el sprite correcto
-                screen.blit(sprite_actual_jugador, (pos_x, pos_y))
-                
+            elif tablero[i][j] == TRONCO:
+                # Si la casilla a la izquierda está dentro de la matriz y también es TRONCO,
+                # significa que esta casilla actual es la parte derecha del tronco.
+                if j - 1 >= 0 and tablero[i][j - 1] == TRONCO:
+                    screen.blit(sprite_tronco_der, (pos_x, pos_y))
+                else:
+                    screen.blit(sprite_tronco_izq, (pos_x, pos_y))
+                    
             elif tablero[i][j] == MANZANA:
                 screen.blit(sprite_manzana, (pos_x, pos_y))
 
-            pos_x += ancho_elem
-        pos_y += alto_elem
+    # ETAPA 3: Dibujar la anatomía del ciervo
+    # CASO ESPECIAL: Si la partida recién inicia y mide 1 casilla, se ve el cuerpo completo compacto
+    if len(pos_cuerpo) == 1:
+        col, fila = pos_cuerpo[0]
+        # Buscamos la lista de animación según la dirección; si no existe, usa la de por defecto (0, 0)
+        lista_animacion = sprites_compacto.get(direccion, sprites_compacto[(0, 0)])
+        screen.blit(lista_animacion[frame_actual], (col * ancho_elem, fila * alto_elem))
+    else:
+        # Si ya se alargó, dibujamos pieza por pieza secuencialmente
+        for indice, pos in enumerate(pos_cuerpo):
+            col, fila = pos
+            pos_x = col * ancho_elem
+            pos_y = fila * alto_elem
+
+            if indice == 0:
+                # CABEZA
+                lista_animacion = sprites_cabeza.get(direccion, sprites_cabeza[(0, 0)])
+                screen.blit(lista_animacion[frame_actual], (pos_x, pos_y))
+
+            elif indice == len(pos_cuerpo) - 1:
+                # TRASERO
+                # Obtenemos el bloque de cuerpo justo antes de la cola
+                bloque_anterior = pos_cuerpo[indice - 1]
+                
+                # dirección real del trasero (restando las posiciones)
+                # bloque_anterior (x, y) - cola (x, y)
+                dir_trasero_x = bloque_anterior[0] - col
+                dir_trasero_y = bloque_anterior[1] - fila
+                dir_trasero = (dir_trasero_x, dir_trasero_y)
+
+                # Busca la animación usando su propia dirección calculada
+                lista_animacion = sprites_trasero.get(dir_trasero, sprites_trasero[(0, 0)])
+                screen.blit(lista_animacion[frame_actual], (pos_x, pos_y))
+
+            else:
+                # CUERPO INTERMEDIO (Lógica de conexiones e intermedios)
+                pos_anterior = pos_cuerpo[indice - 1] # Hacia la cabeza
+                pos_siguiente = pos_cuerpo[indice + 1] # Hacia el trasero
+                
+                # Evaluamos los ejes comparando los vecinos
+                mismo_eje_x = (pos_anterior[0] == col == pos_siguiente[0])
+                mismo_eje_y = (pos_anterior[1] == fila == pos_siguiente[1])
+                
+                if mismo_eje_x:
+                    # El segmento viene de arriba y va hacia abajo (Eje vertical Y)
+                    screen.blit(sprite_cuerpo_y, (pos_x, pos_y))
+                elif mismo_eje_y:
+                    # El segmento viene de la izquierda y va a la derecha (Eje horizontal X)
+                    screen.blit(sprite_cuerpo_x, (pos_x, pos_y))
+                else:
+                    # ¡LOGICA DE ESQUINAS ROTATIVAS!
+                    # Calculamos los vectores relativos de los dos vecinos respecto a la casilla actual
+                    vecino1_x = pos_anterior[0] - col
+                    vecino1_y = pos_anterior[1] - fila
+                    vecino2_x = pos_siguiente[0] - col
+                    vecino2_y = pos_siguiente[1] - fila
+                    
+                    # Sumamos los vectores para saber en qué diagonal se forma el "codo" o esquina
+                    G_X = vecino1_x + vecino2_x
+                    G_Y = vecino1_y + vecino2_y
+                    
+                    # Asumimos que tu imagen "cuerpo_esquina.png" original está dibujada como una curva 
+                    # que conecta la ARRIBA con la DERECHA (Esquina Superior Derecha ◜ )
+                    if G_X == 1 and G_Y == -1:    # Conecta Arriba y Derecha
+                        esquina_rotada = sprite_cuerpo_esquina
+                    elif G_X == -1 and G_Y == -1:  # Conecta Arriba e Izquierda (Girar 90° en sentido horario)
+                        esquina_rotada = pygame.transform.rotate(sprite_cuerpo_esquina, 90)
+                    elif G_X == -1 and G_Y == 1:   # Conecta Abajo e Izquierda (Girar 180°)
+                        esquina_rotada = pygame.transform.rotate(sprite_cuerpo_esquina, 180)
+                    elif G_X == 1 and G_Y == 1:    # Conecta Abajo e Derecha (Girar 270°)
+                        esquina_rotada = pygame.transform.rotate(sprite_cuerpo_esquina, 270)
+                    else:
+                        esquina_rotada = sprite_cuerpo_esquina # Fallback por seguridad
+                        
+                    screen.blit(esquina_rotada, (pos_x, pos_y))
 
     pygame.display.flip()
 
@@ -200,7 +312,7 @@ def cambiar_direccion(keys, direccion_actual):
         return (0, -1)
 
     # Tecla S
-    if keys== pygame.K_s and direccion_actual != (0.-1) :
+    if keys== pygame.K_s and direccion_actual != (0,-1) :
         # En este caso avanzará a través de las filas del tablero.
         return (0, 1)
 
@@ -252,7 +364,7 @@ def avanzar(tablero, pos_cuerpo, direccion, manzanas_comidas):
     # Obtenemos el elemento que se encuentre en el tablero en la nueva posición del jugador.
     pos_elem = tablero[ind_nueva_fila][ind_nueva_col]
 
-    if pos_elem == OBSTACULO:
+    if pos_elem == OBSTACULO or pos_elem == TRONCO:
         return "derrota", pos_cuerpo, manzanas_comidas 
     
     # Verificamos que no choque contra si mismo
@@ -371,20 +483,47 @@ def main():
     
     # DICCIONARIO PARA GUARDAR LOS SPRITES YA PROCESADOS
     sprites_jugador_escalados = {}
+    sprites_trasero = {} # Se inicializa el diccionario vacío aquí
+    sprites_compacto = {}
 
     try:
-        # CARGA Y ESCALA DE ANIMACIONES DEL JUGADOR
-        # Iteramos sobre nuestro diccionario de rutas para cargarlas todas en memoria de forma eficiente
+        # CARGA Y ESCALA DE ANIMACIONES DE LA CABEZA Y TRASERO
         for dir_tupla, rutas_lista in IMG_JUGADOR_ANIM.items():
             sprites_jugador_escalados[dir_tupla] = [
                 pygame.transform.scale(pygame.image.load(ruta).convert_alpha(), tamano_casilla)
                 for ruta in rutas_lista
             ]
+        for dir_tupla, rutas_lista in IMG_TRASERO_ANIM.items():
+            sprites_trasero[dir_tupla] = [
+                pygame.transform.scale(pygame.image.load(ruta).convert_alpha(), tamano_casilla)
+                for ruta in rutas_lista
+            ]
+        for dir_tupla, rutas_lista in IMG_COMPACTO_ANIM.items():
+            sprites_compacto[dir_tupla] = [
+                pygame.transform.scale(pygame.image.load(ruta).convert_alpha(), tamano_casilla)
+                for ruta in rutas_lista
+            ]
 
+        # CORRECCIÓN: Cargar los sprites individuales que faltaban
         sprite_obstaculo = pygame.transform.scale(pygame.image.load(IMG_OBSTACULO).convert_alpha(), tamano_casilla)
         sprite_manzana = pygame.transform.scale(pygame.image.load(IMG_MANZANA).convert_alpha(), tamano_casilla)
         sprite_fondo = pygame.transform.scale(pygame.image.load(IMG_FONDO).convert(), screen.get_size())
         
+        # --- NUEVOS SPRITES CARGADOS ---
+        # Carga de variaciones del lomo/cuerpo
+        sprite_cuerpo_x = pygame.transform.scale(pygame.image.load(IMG_CUERPO_X).convert_alpha(), tamano_casilla)
+        sprite_cuerpo_y = pygame.transform.scale(pygame.image.load(IMG_CUERPO_Y).convert_alpha(), tamano_casilla)
+        sprite_cuerpo_esquina = pygame.transform.scale(pygame.image.load(IMG_CUERPO_ESQUINA).convert_alpha(), tamano_casilla)
+        
+        # Carga de las dos mitades del tronco continuo
+        sprite_tronco_izq = pygame.transform.scale(pygame.image.load(IMG_TRONCO_IZQ).convert_alpha(), tamano_casilla)
+        sprite_tronco_der = pygame.transform.scale(pygame.image.load(IMG_TRONCO_DER).convert_alpha(), tamano_casilla)
+        
+        
+        # Asignamos cabeza usando el diccionario de animaciones que ya cargué
+        sprites_cabeza = sprites_jugador_escalados
+        # Nota: sprites_trasero se cargó correctamente arriba con mis propias imágenes
+
     except FileNotFoundError as e:
         print(f"Error al cargar los sprites: {e}. Asegúrate de que existan en la carpeta.")
         pygame.quit()
@@ -395,63 +534,74 @@ def main():
     tablero = []
     pos_cuerpo = []
     direccion = (0, 0)
-    direccion_actual= (0,0)
+    direccion_actual = (0,0)
     tiempo_ultimo_mov = 0
     manzanas_comidas = 0
-    
-    # NUEVA VARIABLE: Controla cuál frame de la animación mostrar (0 o 1)
     frame_actual = 0
 
     mostrar_pantalla(screen, PANTALLA_INICIO)
+    paso_procesado = True  
 
     while running:
+        tiempo_actual = pygame.time.get_ticks()
+
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 running = False
 
             if evento.type == pygame.KEYDOWN:
+                # 1. ESTADO INICIO
                 if estado == ESTADO_INICIO:
                     if evento.key == pygame.K_SPACE:
                         tablero, pos_cuerpo = reiniciar()
                         manzanas_comidas = 0
                         direccion = (0, 0)
-                        direccion_actual= (0,0)
-                        frame_actual = 0 # Inicializar frame
+                        direccion_actual = (0,0)
+                        frame_actual = 0 
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
-                        # Se añade 'direccion' y 'frame_actual' a los argumentos
-                        refrescar_tablero(screen, tablero, sprites_jugador_escalados, sprite_obstaculo, sprite_manzana, sprite_fondo, direccion, frame_actual)
+                        
+                        # Arreglo de Bug: Limpia cualquier tecla WASD que se haya quedado grabada en el búfer antes de empezar
+                        pygame.event.clear(pygame.KEYDOWN) 
+                        
+                        refrescar_tablero(screen, tablero, sprites_cabeza, sprite_cuerpo_x, sprite_cuerpo_y, sprite_cuerpo_esquina, sprites_trasero, sprites_compacto, sprite_obstaculo, sprite_tronco_izq, sprite_tronco_der, sprite_manzana, sprite_fondo, direccion, frame_actual, pos_cuerpo)
                     elif evento.key == pygame.K_i:
                         estado = ESTADO_INSTRUCCIONES
                         mostrar_pantalla(screen, PANTALLA_INSTRUCCIONES)
 
+                # 2. ESTADO INSTRUCCIONES
                 elif estado == ESTADO_INSTRUCCIONES:
                     estado = ESTADO_INICIO
                     mostrar_pantalla(screen, PANTALLA_INICIO)
 
+                # 3. ESTADOS FINALES
                 elif estado in (ESTADO_DERROTA, ESTADO_VICTORIA):
                     if evento.key == pygame.K_r:
                         tablero, pos_cuerpo = reiniciar()
                         manzanas_comidas = 0
                         direccion = (0, 0)
-                        direccion_actual= (0,0)
+                        direccion_actual = (0,0)
                         frame_actual = 0
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
-                        refrescar_tablero(screen, tablero, sprites_jugador_escalados, sprite_obstaculo, sprite_manzana, sprite_fondo, direccion, frame_actual)
-
+                        pygame.event.clear(pygame.KEYDOWN) # También limpiamos al reiniciar
+                        refrescar_tablero(screen, tablero, sprites_cabeza, sprite_cuerpo_x, sprite_cuerpo_y, sprite_cuerpo_esquina, sprites_trasero, sprites_compacto, sprite_obstaculo, sprite_tronco_izq, sprite_tronco_der, sprite_manzana, sprite_fondo, direccion, frame_actual, pos_cuerpo)
                     if evento.key == pygame.K_ESCAPE:
                         estado = ESTADO_INICIO
                         mostrar_pantalla(screen, PANTALLA_INICIO)
 
+                # 4. ESTADO JUGANDO (Solo aquí reacciona a WASD)
                 elif estado == ESTADO_JUGANDO:
-                    nueva_dir=cambiar_direccion(evento.key, direccion_actual)
-                    if nueva_dir is not None:
-                        direccion=nueva_dir
+                    # Filtramos para que solo procese si la tecla es efectivamente de movimiento
+                    if evento.key in (pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d):
+                        if paso_procesado:  
+                            nueva_dir = cambiar_direccion(evento.key, direccion_actual)
+                            if nueva_dir is not None:
+                                direccion = nueva_dir
+                                paso_procesado = False  
 
+        # --- LÓGICA DE MOVIMIENTO ---
         if estado == ESTADO_JUGANDO:
-            tiempo_actual = pygame.time.get_ticks()
-
             if direccion != (0, 0) and tiempo_actual - tiempo_ultimo_mov >= RETRASO:
                 resultado, pos_cuerpo, manzanas_comidas = avanzar(tablero, pos_cuerpo, direccion, manzanas_comidas)
 
@@ -463,13 +613,11 @@ def main():
                     mostrar_pantalla(screen, PANTALLA_VICTORIA)
                 else:
                     tiempo_ultimo_mov = tiempo_actual
-
-                    direccion_actual=direccion
-                    
-                    # LOGICA DE ANIMACIÓN: Alterna entre el frame 0 y 1 en cada movimiento exitoso
+                    direccion_actual = direccion
                     frame_actual = 1 - frame_actual 
+                    paso_procesado = True  
                     
-                    refrescar_tablero(screen, tablero, sprites_jugador_escalados, sprite_obstaculo, sprite_manzana, sprite_fondo, direccion, frame_actual)
+                    refrescar_tablero(screen, tablero, sprites_cabeza, sprite_cuerpo_x, sprite_cuerpo_y, sprite_cuerpo_esquina, sprites_trasero, sprites_compacto, sprite_obstaculo, sprite_tronco_izq, sprite_tronco_der, sprite_manzana, sprite_fondo, direccion, frame_actual, pos_cuerpo)
 
     pygame.quit()
 
