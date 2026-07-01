@@ -194,32 +194,32 @@ def cambiar_direccion(keys, direccion_actual):
     """
 
     # Tecla W
-    if keys[pygame.K_w]:
+    if keys == pygame.K_w and direccion_actual != (0,1):
         # La tupla nos indica que horizontalmente (columnas) no hará nada (0) y
         # que verticalmente (filas) disminuirá el índice en el tablero (-1).
         return (0, -1)
 
     # Tecla S
-    if keys[pygame.K_s]:
+    if keys== pygame.K_s and direccion_actual != (0.-1) :
         # En este caso avanzará a través de las filas del tablero.
         return (0, 1)
 
     # Tecla A
-    if keys[pygame.K_a]:
+    if keys== pygame.K_a and direccion_actual != (1,0) :
         # Retrocede por las columnas del tablero.
         return (-1, 0)
 
     # Tecla D
-    if keys[pygame.K_d]:
+    if keys == pygame.K_d and direccion_actual != (-1,0):
         # Avanza por las columnas del tablero.
         return (1, 0)
 
     # Si no se presiona ninguna de las teclas anteriores, la dirección
     # será la misma que la anterior.
-    return direccion_actual
+    return None
 
 
-def avanzar(tablero, pos_jugador, direccion, manzanas_comidas):
+def avanzar(tablero, pos_cuerpo, direccion, manzanas_comidas):
     """
     Avanza el jugador un paso en la dirección dada.
 
@@ -237,9 +237,9 @@ def avanzar(tablero, pos_jugador, direccion, manzanas_comidas):
     # Obtenemos los componentes "x" e "y" de cada tupla recibida
     # con información de la dirección y posición del jugador.
     dir_col, dir_fila = direccion
-    ind_actual_col, ind_actual_fila = (
-        pos_jugador  # Tupla (columna, fila) que representa los índices en el tablero.
-    )
+    ind_actual_col, ind_actual_fila = pos_cuerpo[0]
+      # Tupla (columna, fila) que representa los índices en el tablero.
+
 
     # Aplicamos la dirección a la posición del jugador.
     ind_nueva_col = ind_actual_col + dir_col
@@ -247,28 +247,40 @@ def avanzar(tablero, pos_jugador, direccion, manzanas_comidas):
 
     # Verificamos que no haya choque con el borde del tablero.
     if not (0 <= ind_nueva_col < COLUMNAS and 0 <= ind_nueva_fila < FILAS):
-        return "derrota", pos_jugador, manzanas_comidas 
+        return "derrota", pos_cuerpo, manzanas_comidas 
 
     # Obtenemos el elemento que se encuentre en el tablero en la nueva posición del jugador.
     pos_elem = tablero[ind_nueva_fila][ind_nueva_col]
 
     if pos_elem == OBSTACULO:
-        return "derrota", pos_jugador, manzanas_comidas 
+        return "derrota", pos_cuerpo, manzanas_comidas 
+    
+    # Verificamos que no choque contra si mismo
+    if (ind_nueva_col, ind_nueva_fila) in pos_cuerpo [:-1]:
+        return "derrota", pos_cuerpo, manzanas_comidas
 
+    ind_cola_col, ind_cola_fila = pos_cuerpo[-1]
+
+    for i in range (len(pos_cuerpo)-1,0,-1):
+        pos_cuerpo[i] = pos_cuerpo [i-1]
+    
+    pos_cuerpo[0]= (ind_nueva_col, ind_nueva_fila)
+    tablero[ind_nueva_fila][ind_nueva_col]=JUGADOR
+
+    tablero[ind_cola_fila][ind_cola_col] = VACIO
+    
     if pos_elem == MANZANA :
         manzanas_comidas += 1
         # Mover al jugador a la nueva casilla
-        tablero [ ind_actual_fila ][ ind_actual_col ] = VACIO
-        tablero [ ind_nueva_fila ] [ ind_nueva_col ] = JUGADOR
+        pos_cuerpo.append((ind_cola_col, ind_cola_fila))
+        tablero[ind_cola_fila][ind_cola_col]=JUGADOR
         # Si llegamos al objetivo, victoria
         if manzanas_comidas >= MANZANAS_PARA_GANAR:
-            return "victoria", (ind_nueva_col, ind_nueva_fila), manzanas_comidas
+            return "victoria", pos_cuerpo, manzanas_comidas
         aparecer_aleatorio(tablero, MANZANA)
-        return "ok", (ind_nueva_col, ind_nueva_fila), manzanas_comidas
+        return "ok", pos_cuerpo, manzanas_comidas
 
-    tablero[ind_actual_fila][ind_actual_col] = VACIO
-    tablero[ind_nueva_fila][ind_nueva_col] = JUGADOR
-    return "ok", (ind_nueva_col, ind_nueva_fila), manzanas_comidas
+    return "ok", pos_cuerpo, manzanas_comidas
 def reiniciar():
     """
     Crea un nuevo tablero y estado para una nueva partida.
@@ -316,9 +328,9 @@ def reiniciar():
     poblar_tablero(tablero)
 
     # Colocamos al jugador en una posición aleatoria.
-    pos_jugador = aparecer_aleatorio(tablero, JUGADOR)
+    pos_cuerpo = [aparecer_aleatorio(tablero, JUGADOR)]
 
-    return tablero, pos_jugador
+    return tablero, pos_cuerpo
 
 
 def mostrar_pantalla(screen, nombre_archivo):
@@ -381,8 +393,9 @@ def main():
     running = True
     estado = ESTADO_INICIO
     tablero = []
-    pos_jugador = (0, 0)
+    pos_cuerpo = []
     direccion = (0, 0)
+    direccion_actual= (0,0)
     tiempo_ultimo_mov = 0
     manzanas_comidas = 0
     
@@ -399,9 +412,10 @@ def main():
             if evento.type == pygame.KEYDOWN:
                 if estado == ESTADO_INICIO:
                     if evento.key == pygame.K_SPACE:
-                        tablero, pos_jugador = reiniciar()
+                        tablero, pos_cuerpo = reiniciar()
                         manzanas_comidas = 0
                         direccion = (0, 0)
+                        direccion_actual= (0,0)
                         frame_actual = 0 # Inicializar frame
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
@@ -417,9 +431,10 @@ def main():
 
                 elif estado in (ESTADO_DERROTA, ESTADO_VICTORIA):
                     if evento.key == pygame.K_r:
-                        tablero, pos_jugador = reiniciar()
+                        tablero, pos_cuerpo = reiniciar()
                         manzanas_comidas = 0
                         direccion = (0, 0)
+                        direccion_actual= (0,0)
                         frame_actual = 0
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
@@ -430,13 +445,15 @@ def main():
                         mostrar_pantalla(screen, PANTALLA_INICIO)
 
                 elif estado == ESTADO_JUGANDO:
-                    direccion = cambiar_direccion(pygame.key.get_pressed(), direccion)
+                    nueva_dir=cambiar_direccion(evento.key, direccion_actual)
+                    if nueva_dir is not None:
+                        direccion=nueva_dir
 
         if estado == ESTADO_JUGANDO:
             tiempo_actual = pygame.time.get_ticks()
 
             if direccion != (0, 0) and tiempo_actual - tiempo_ultimo_mov >= RETRASO:
-                resultado, pos_jugador, manzanas_comidas = avanzar(tablero, pos_jugador, direccion, manzanas_comidas)
+                resultado, pos_cuerpo, manzanas_comidas = avanzar(tablero, pos_cuerpo, direccion, manzanas_comidas)
 
                 if resultado == "derrota":
                     estado = ESTADO_DERROTA
@@ -446,6 +463,8 @@ def main():
                     mostrar_pantalla(screen, PANTALLA_VICTORIA)
                 else:
                     tiempo_ultimo_mov = tiempo_actual
+
+                    direccion_actual=direccion
                     
                     # LOGICA DE ANIMACIÓN: Alterna entre el frame 0 y 1 en cada movimiento exitoso
                     frame_actual = 1 - frame_actual 
