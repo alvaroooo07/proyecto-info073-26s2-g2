@@ -21,8 +21,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Apunta a una carpeta dentro de "main"
 
 DIR_TEXTURAS = os.path.join(BASE_DIR, "textures")
+DIR_SONIDOS = os.path.join(DIR_TEXTURAS, "sonidos")
 
-# NUEVO: Ruta hacia la subcarpeta de animaciones del ciervo
+# Ruta hacia la subcarpeta de animaciones del ciervo
 
 DIR_CUERPO_CIERVO = os.path.join(DIR_TEXTURAS, "cuerpo ciervo") #carpeta para las nuevas texturas del cuerpo del ciervo (cuando se alarga)
 DIR_CUERPO_TRONCO = os.path.join(DIR_TEXTURAS, "cuerpo tronco") #Carpeta para las nuevas texturas del tronco
@@ -40,6 +41,16 @@ PANTALLA_INICIO = os.path.join(DIR_TEXTURAS, "Pant_Inicio.png")
 PANTALLA_INSTRUCCIONES = os.path.join(DIR_TEXTURAS, "instructionTEST.jpg") #
 PANTALLA_VICTORIA = os.path.join(DIR_TEXTURAS, "Pant_Victoria.png")
 PANTALLA_DERROTA = os.path.join(DIR_TEXTURAS, "Pant_Muerte.png")
+
+# Rutas de música de fondo (pueden ser .mp3 o .ogg)
+MUSICA_INICIO = os.path.join(DIR_SONIDOS, "song_inicio.mp3")
+MUSICA_JUEGO = os.path.join(DIR_SONIDOS, "song_juego_test.mp3")
+MUSICA_VICTORIA = os.path.join(DIR_SONIDOS, "song_victory_test.mp3")
+MUSICA_DERROTA = os.path.join(DIR_SONIDOS, "song_dead.mp3")
+
+# Rutas de efectos de sonido (se recomienda .wav o .ogg para efectos cortos)
+SND_MANZANA = os.path.join(DIR_SONIDOS, "sfx_manzana.wav")
+SND_CHOQUE = os.path.join(DIR_SONIDOS, "sfx_dead.wav")
 
 # Rutas a imágenes personalizadas
 # --- ANIMACIONES DE LA CABEZA ---
@@ -298,7 +309,7 @@ def refrescar_tablero(screen, tablero, sprites_cabeza, sprite_cuerpo_x, sprite_c
                     G_X = vecino1_x + vecino2_x
                     G_Y = vecino1_y + vecino2_y
                     
-                    # Asumimos que tu imagen "cuerpo_esquina.png" original está dibujada como una curva 
+                    
                     # que conecta la ARRIBA con la DERECHA (Esquina Superior Derecha ◜ )
                     if G_X == 1 and G_Y == -1:    # Conecta Arriba y Derecha
                         esquina_rotada = sprite_cuerpo_esquina
@@ -417,7 +428,7 @@ def avanzar(tablero, pos_cuerpo, direccion, manzanas_comidas):
         if manzanas_comidas >= MANZANAS_PARA_GANAR:
             return "victoria", pos_cuerpo, manzanas_comidas
         aparecer_aleatorio(tablero, MANZANA)
-        return "ok", pos_cuerpo, manzanas_comidas
+        return "manzana", pos_cuerpo, manzanas_comidas
 
     return "ok", pos_cuerpo, manzanas_comidas
 def reiniciar():
@@ -470,6 +481,16 @@ def reiniciar():
     pos_cuerpo = [aparecer_aleatorio(tablero, JUGADOR)]
 
     return tablero, pos_cuerpo
+
+
+def reproducir_musica(ruta_archivo):
+    """Detiene la música actual y reproduce una nueva en bucle infinito."""
+    try:
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load(ruta_archivo)
+        pygame.mixer.music.play(-1) # -1 significa que se repetirá indefinidamente
+    except pygame.error:
+        print(f"No se pudo reproducir el archivo de música: {ruta_archivo}")
 
 
 def mostrar_pantalla(screen, nombre_archivo):
@@ -552,6 +573,9 @@ def main():
         sprite_tronco_izq = pygame.transform.scale(pygame.image.load(IMG_TRONCO_IZQ).convert_alpha(), tamano_casilla)
         sprite_tronco_der = pygame.transform.scale(pygame.image.load(IMG_TRONCO_DER).convert_alpha(), tamano_casilla)
         
+        # Cargar objetos de efectos de sonido
+        sonido_manzana = pygame.mixer.Sound(SND_MANZANA)
+        sonido_choque = pygame.mixer.Sound(SND_CHOQUE)
         
         # Asignamos cabeza usando el diccionario de animaciones que ya cargué
         sprites_cabeza = sprites_jugador_escalados
@@ -573,6 +597,7 @@ def main():
     frame_actual = 0
 
     mostrar_pantalla(screen, PANTALLA_INICIO)
+    reproducir_musica(MUSICA_INICIO)
     paso_procesado = True  
 
     while running:
@@ -586,18 +611,21 @@ def main():
                 # 1. ESTADO INICIO
                 if estado == ESTADO_INICIO:
                     if evento.key == pygame.K_SPACE:
-                        tablero, pos_cuerpo = reiniciar()
+                        tablero, pos_cuerpo = reiniciar() # REEMPLAZADO: Faltaba inicializar el tablero aquí
                         manzanas_comidas = 0
                         direccion = (0, 0)
                         direccion_actual = (0,0)
                         frame_actual = 0 
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
+                        reproducir_musica(MUSICA_JUEGO) 
                         
-                        # Arreglo de Bug: Limpia cualquier tecla WASD que se haya quedado grabada en el búfer antes de empezar
+                        # Limpia el búfer de teclas antes de empezar
                         pygame.event.clear(pygame.KEYDOWN) 
                         
+                        # CORRECCIÓN LÍNEA 617: Pasamos todos los argumentos reales
                         refrescar_tablero(screen, tablero, sprites_cabeza, sprite_cuerpo_x, sprite_cuerpo_y, sprite_cuerpo_esquina, sprites_trasero, sprites_compacto, sprite_obstaculo, sprite_tronco_izq, sprite_tronco_der, sprite_manzana, sprite_fondo, direccion, frame_actual, pos_cuerpo, manzanas_comidas, fuente)
+                    
                     elif evento.key == pygame.K_i:
                         estado = ESTADO_INSTRUCCIONES
                         mostrar_pantalla(screen, PANTALLA_INSTRUCCIONES)
@@ -610,17 +638,23 @@ def main():
                 # 3. ESTADOS FINALES
                 elif estado in (ESTADO_DERROTA, ESTADO_VICTORIA):
                     if evento.key == pygame.K_r:
-                        tablero, pos_cuerpo = reiniciar()
+                        tablero, pos_cuerpo = reiniciar() # REEMPLAZADO: Faltaba inicializar al reiniciar
                         manzanas_comidas = 0
                         direccion = (0, 0)
                         direccion_actual = (0,0)
                         frame_actual = 0
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
-                        pygame.event.clear(pygame.KEYDOWN) # También limpiamos al reiniciar
+                        reproducir_musica(MUSICA_JUEGO) 
+                        
+                        pygame.event.clear(pygame.KEYDOWN) 
+                        
+                        # CORRECCIÓN AQUÍ TAMBIÉN: Pasamos todos los argumentos reales
                         refrescar_tablero(screen, tablero, sprites_cabeza, sprite_cuerpo_x, sprite_cuerpo_y, sprite_cuerpo_esquina, sprites_trasero, sprites_compacto, sprite_obstaculo, sprite_tronco_izq, sprite_tronco_der, sprite_manzana, sprite_fondo, direccion, frame_actual, pos_cuerpo, manzanas_comidas, fuente)
+                    
                     if evento.key == pygame.K_ESCAPE:
                         estado = ESTADO_INICIO
+                        reproducir_musica(MUSICA_INICIO) 
                         mostrar_pantalla(screen, PANTALLA_INICIO)
 
                 # 4. ESTADO JUGANDO (Solo aquí reacciona a WASD)
@@ -640,11 +674,18 @@ def main():
 
                 if resultado == "derrota":
                     estado = ESTADO_DERROTA
+                    sonido_choque.play()             # Efecto de choque
+                    reproducir_musica(MUSICA_DERROTA)# Música de Game Over
                     mostrar_pantalla(screen, PANTALLA_DERROTA)
                 elif resultado == "victoria":
                     estado = ESTADO_VICTORIA
+                    sonido_manzana.play()             # Come la última manzana
+                    reproducir_musica(MUSICA_VICTORIA)# Música de Victoria
                     mostrar_pantalla(screen, PANTALLA_VICTORIA)
                 else:
+                    if resultado == "manzana":
+                        sonido_manzana.play()
+
                     tiempo_ultimo_mov = tiempo_actual
                     direccion_actual = direccion
                     frame_actual = 1 - frame_actual 
