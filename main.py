@@ -620,8 +620,7 @@ def main():
                         estado = ESTADO_JUGANDO
                         reproducir_musica(MUSICA_JUEGO) 
                         
-                        # Limpia el búfer de teclas antes de empezar
-                        pygame.event.clear(pygame.KEYDOWN) 
+                        paso_procesado= True
                         
                         # CORRECCIÓN LÍNEA 617: Pasamos todos los argumentos reales
                         refrescar_tablero(screen, tablero, sprites_cabeza, sprite_cuerpo_x, sprite_cuerpo_y, sprite_cuerpo_esquina, sprites_trasero, sprites_compacto, sprite_obstaculo, sprite_tronco_izq, sprite_tronco_der, sprite_manzana, sprite_fondo, direccion, frame_actual, pos_cuerpo, manzanas_comidas, fuente)
@@ -647,7 +646,7 @@ def main():
                         estado = ESTADO_JUGANDO
                         reproducir_musica(MUSICA_JUEGO) 
                         
-                        pygame.event.clear(pygame.KEYDOWN) 
+                        paso_procesado= True
                         
                         # CORRECCIÓN AQUÍ TAMBIÉN: Pasamos todos los argumentos reales
                         refrescar_tablero(screen, tablero, sprites_cabeza, sprite_cuerpo_x, sprite_cuerpo_y, sprite_cuerpo_esquina, sprites_trasero, sprites_compacto, sprite_obstaculo, sprite_tronco_izq, sprite_tronco_der, sprite_manzana, sprite_fondo, direccion, frame_actual, pos_cuerpo, manzanas_comidas, fuente)
